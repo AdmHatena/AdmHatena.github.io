@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>e3特効計算</title>
+    <style>
+      body{
+        background-color: #333;
+        color: #fff;
+        margin: 20px;
+      }
+      table{
+        border: 2;
+        border-collapse: collapse;
+        border-color: #fff;
+      }
+      td{
+        user-select: none; /* CSS3 */
+        -moz-user-select: none; /* Firefox */
+        -webkit-user-select: none; /* Safari、Chromeなど */
+        -ms-user-select: none; /* IE10かららしい */
+      }
+      .attacker{
+        color: #aaf;
+      }
+      .bomber{
+        color: #faa;
+      }
+      .fighter{
+        color: #afa;
+      }
+      .searcher{
+        color: #ffa;
+      }
+      .selected{
+        background-color: #444;
+      }
+    </style>
+  </head>
+  <body>
+    <meta id="toggle">
+    <table border="1">
+      <thead>
+        <tr>
+          <th colspan="4">e3艦載機特効</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+          <td>A</td>
+          <td>B</td>
+          <td>C</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td></td>
+          <td id="b1">
+            <div class="bomber">Re.2001 CR改</div>
+            <div class="bomber">Skua</div>
+            <div class="bomber">Ju87C改</div>
+            <div class="bomber">Ju87C改二(KMX搭載機)</div>
+            <div class="bomber">Ju87C改二(KMX搭載機/熟練)</div>
+          </td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td id="a2">
+            <div class="attacker">swordfish</div>
+            <div class="attacker">TBF</div>
+            <div class="attacker">TBM-3D</div>
+            <div class="bomber">FM-2</div>
+            <div class="bomber">F4U-1D</div>
+            <div class="fighter">F4F-3</div>
+            <div class="fighter">F4F-4</div>
+            <div class="fighter">F6F-3</div>
+            <div class="fighter">F6F-3N</div>
+            <div class="fighter">F6F-5</div>
+          </td>
+          <td id="b2">
+            <div class="fighter">Bf109T改</div>
+            <div class="fighter">Fw190T改</div>
+            <div class="fighter">Fw190T A-5改(熟練)</div>
+          </td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td id="a3">
+            <div class="attacker">swordfish mk.II(熟練)</div>
+            <div class="attacker">Re.2001 G改</div>
+            <div class="fighter">FR-1 Fireball</div>
+          </td>
+          <td id="b3">
+            <div class="fighter">Re.2001 OR改</div>
+            <div class="fighter">Fulmar</div>
+          </td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td id="a4">
+            <div class="attacker">Barracuda Mk.II</div>
+            <div class="attacker">Barracuda Mk.III</div>
+            <div class="attacker">swordfish mk.III(熟練)</div>
+          </td>
+          <td id="b4">
+            <div class="fighter">Re.2005改</div>
+          </td>
+          <td id="c4">
+            <div class="fighter">Seafire Mk.III改</div>
+            <div class="fighter">Corsair Mk.II</div>
+            <div class="fighter">Corsair Mk.II(Ace)</div>
+            <div class="searcher">Fulmar(戦闘偵察/熟練)</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <span class="attacker">艦攻</span>
+    <span class="bomber">艦爆</span>
+    <span class="fighter">艦戦</span>
+    <span class="searcher">艦偵</span>
+    <br>
+    <h4>倍率</h4>
+    <div id="route">道中 : <span>1</span></div>
+    <div id="boss12">ボス1,2 : <span>1</span></div>
+    <div id="boss3">ボス3 : <span>1</span></div>
+    <div id="boss4">ボス4 : <span>1</span></div>
+    <script>
+      const ids = ['b1', 'a2', 'b2', 'a3', 'b3', 'a4', 'b4', 'c4'];
+      const ratio = {
+        route: {a: 1, b:1.08, c:1.15, 1:1, 2:1.05, 3:1.08, 4:1.08},
+        boss12: {a: 1, b:1.08, c:1.15, 1:1, 2:1.1, 3:1.12, 4:1.12},
+        boss3: {a: 1, b:1.4, c:1.15, 1:1, 2:1.1, 3:1.12, 4:1.12},
+        boss4: {a: 1, b:1.1, c:1.18, 1:1, 2:1.1, 3:1.15, 4:1.15},
+      };
+      for(const id of ids){
+        document.querySelector(`#${id}`).addEventListener('mouseup', event=>{
+          document.querySelector('#toggle').classList.toggle(id);
+          document.querySelector(`#${id}`).classList.toggle('selected');
+          calc();
+        });
+      }
+      function calc(){
+        const result = {};
+        const flags = {a:false,b:false,c:false,1:false,2:false,3:false,4:false};
+        for(const val of document.querySelector('#toggle').classList){
+          flags[val[0]] = true;
+          flags[val[1]] = true;
+        }
+        console.log(flags);
+        for(const key of Object.keys(ratio)){
+          result[key] = 1;
+          for(const fk of Object.keys(flags)){
+            if(flags[fk]) result[key] *= ratio[key][fk];
+          }
+        }
+        for(const key of Object.keys(result)){
+          document.querySelector(`#${key} > span`).innerText = (result[key] + '').substr(0, 5);
+        }
+      }
+      calc();
+    </script>
+  </body>
+</html>
